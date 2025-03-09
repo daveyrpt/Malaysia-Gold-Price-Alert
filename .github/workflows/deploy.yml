@@ -1,0 +1,31 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - k8s-test  # Change this if your main branch is named differently
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to DigitalOcean
+        run: |
+          ssh root@${{ secrets.DROPLET_IP }} << 'EOF'
+            cd /var/www/Malaysia-Gol-Price_Alert
+            git pull origin k8s-test  # Pull the latest code
+            docker-compose down   # Stop existing containers
+            docker-compose build  # Build the new Docker image
+            docker-compose up -d  # Start the updated containers
+          EOF
