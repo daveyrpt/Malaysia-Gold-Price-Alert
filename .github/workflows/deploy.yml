@@ -23,7 +23,7 @@ jobs:
       - name: Deploy to DigitalOcean
         run: |
           ssh root@${{ secrets.DROPLET_IP }} << 'EOF'
-            cd /var/www/Malaysia-Gol-Price_Alert
+            cd /var/www/Malaysia-Gold-Price_Alert
             git pull origin k8s-test  # Pull the latest code
             docker-compose down   # Stop existing containers
             docker-compose build  # Build the new Docker image
