@@ -1,19 +1,19 @@
-# Use official PHP image with necessary extensions
+# Base PHP-FPM Image
 FROM php:8.2-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    unzip \
+    git \
+    curl \
+    nginx \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-install pdo pdo_mysql gd
 
 # Set working directory
 WORKDIR /var/www
-
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    zip \
-    unzip \
-    git \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -21,10 +21,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy Laravel files
 COPY . .
 
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-CMD ["php-fpm"]
+# Expose ports
+EXPOSE 80
+
+# Start PHP-FPM and Nginx
+CMD service nginx start && php-fpm
