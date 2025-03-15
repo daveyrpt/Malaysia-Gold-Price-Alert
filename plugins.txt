@@ -1,0 +1,6 @@
+git:latest
+pipeline-stage-view:latest
+workflow-aggregator:latest
+ssh-agent:latest
+docker-plugin:latest
+blueocean:latest
