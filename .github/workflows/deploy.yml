@@ -1,4 +1,4 @@
-name: Deploy to DigitalOcean
+name: Deploy to Nuc Server
 
 on:
   push:
@@ -13,19 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+      - name: Install SSHPass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Deploy to DigitalOcean
+      - name: Deploy to Server via SSH Password
         run: |
-          ssh root@${{ secrets.DROPLET_IP }} << 'EOF'
-            cd /var/www/Malaysia-Gold-Price-Alert
-            git pull origin k8s-test  # Pull the latest code
-            docker-compose down   # Stop existing containers
-            docker-compose build  # Build the new Docker image
-            docker-compose up -d  # Start the updated containers
+          sshpass -p "${{ secrets.NUC_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.NUC_IP_ADDRESS }} << 'EOF'
+            echo 'TESTING'
+            # cd /var/www/Malaysia-Gold-Price-Alert
+            # git pull origin k8s-test  # Pull the latest code
+            # docker-compose down   # Stop existing containers
+            # docker-compose build  # Build the new Docker image
+            # docker-compose up -d  # Start the updated containers
           EOF
