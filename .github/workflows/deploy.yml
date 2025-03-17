@@ -5,24 +5,29 @@ on:
     branches:
       - k8s-test  # Change this if your main branch is named differently
 
+env:
+  USERNAME: dvy
+  PORT : 22
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install SSHPass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
+      - name: Set up SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.NUC_IP_ADDRESS }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.NUC_PASSWORD }}
+          port: ${{ env.PORT }}
+          command_timeout: 30m
+          script: |
+            echo 'Successfully connected to server'
 
-      - name: Deploy to Server via SSH Password
+      - name: Echo message
         run: |
-          sshpass -p "${{ secrets.NUC_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.NUC_IP_ADDRESS }} << 'EOF'
-            echo 'TESTING'
-            # cd /var/www/Malaysia-Gold-Price-Alert
-            # git pull origin k8s-test  # Pull the latest code
-            # docker-compose down   # Stop existing containers
-            # docker-compose build  # Build the new Docker image
-            # docker-compose up -d  # Start the updated containers
-          EOF
+          echo "Successfully connected to server"
