@@ -1,35 +1,35 @@
-# Base PHP-FPM Image
-FROM php:8.2-fpm
+FROM php:8.1-fpm-buster
 
-# Install system dependencies
+ARG user
+ARG uid
+
 RUN apt-get update && apt-get install -y \
-    unzip \
     git \
-    curl \
-    nginx \
+    zip \
+    unzip \
+    libzip-dev \
+    libicu-dev \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    && docker-php-ext-install pdo pdo_mysql gd
+    libmagickwand-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd intl \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /var/www
+RUN docker-php-ext-install bcmath pdo_mysql exif zip
 
-# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy Laravel files
-COPY . .
+RUN useradd -u 1000 -ms /bin/bash -g www-data dvy
 
-# Copy Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+WORKDIR /var/www
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+COPY . /var/www
+COPY --chown=dvy:www-data . /var/www
 
-# Expose ports
-EXPOSE 80
+EXPOSE 9000
 
-# Start PHP-FPM and Nginx
-CMD service nginx start && php-fpm
-
+CMD ["php-fpm"]
