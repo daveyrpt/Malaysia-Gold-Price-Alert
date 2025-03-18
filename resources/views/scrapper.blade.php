@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h2>Gold & Silver Prices</h2>
+    <h2>Gold & Silver Prices Test</h2>
 
     @if(isset($error))
         <p style="color: red;">{{ $error }}</p>
