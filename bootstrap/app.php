@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Contracts\Http\Kernel as Middleware;
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -42,8 +45,8 @@ $app->singleton(
 );
 
 $app->withMiddleware(function (Middleware $middleware) {
-    $middleware->trustProxies(at: '*'); // Trust all proxies
-});
+    $middleware->trustProxies(at: '*');;
+})
 
 /*
 |--------------------------------------------------------------------------
