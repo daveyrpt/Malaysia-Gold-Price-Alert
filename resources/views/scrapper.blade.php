@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A</title>
+    <title>BBA</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { width: 50%; border-collapse: collapse; margin-top: 20px; }
